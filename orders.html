@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>微商城管理端</title>
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css" >
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.css" >
+    <link rel="stylesheet" href="css/my.css">
+    <style>
+        table{
+            padding:2px;
+            margin-top:15px;
+        }
+        th,td{
+            width: 143px;
+            height: 40px;
+        }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="微商城管理端,使管理员轻松管理后台事务">
+</head>
+
+<body>
+
+<script type="text/template" id="ordertemplate">
+        <table class="table table-striped table-bordered table-hover table-condensed" border="1" align="center" style="width: 1000px">
+            <thead>
+            <tr>
+                <th>订单ID</th>
+                <th>用户ID</th>
+                <th>下单时间</th>
+                <th>收货地址</th>
+                <th>联系电话</th>
+                <th>订单状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% _.each(orders, function(order) { %>
+            <tr>
+                <td><%= order.get('id') %></td>
+                <td><%= order.get('userID') %></td>
+                <td><%= order.get('createtime') %></td>
+                <td><%= order.get('address') %></td>
+                <td><%= order.get('phone') %></td>
+                <td><%= order.get('state') %></td>
+                <td></td>
+                <!--orders.models[0].get('username')-->
+            </tr>
+            <% }); %>
+            </tbody>
+        </table>
+</script>
+
+<script type="text/template" id="orderItemtemplate">
+    <table class="table table-striped table-bordered table-hover table-condensed" border="1" align="center"
+           style="width: 1000px; margin-top: 5px">
+        <thead>
+        <tr>
+            <th>订单ID</th>
+            <th>用户ID</th>
+            <th>下单时间</th>
+            <th>收货地址</th>
+            <th>联系电话</th>
+            <th>订单状态</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><%= order.get('id') %></td>
+            <td><%= order.get('userID') %></td>
+            <td><%= order.get('createtime') %></td>
+            <td><%= order.get('address') %></td>
+            <td><%= order.get('phone') %></td>
+            <td><%= order.get('state') %></td>
+        </tr>
+        </tbody>
+    </table>
+</script>
+
+    <div class="container col-md-12" style=" background-color: darkseagreen; height: 100px ">
+        <div class="row" style="text-align: right">
+            <h5 style="margin-right: 10px">欢迎您,xxx <a href="#">退出</a></h5>
+        </div>
+    </div>
+<div style="width: 100%">
+   <div id="searchState"  style="float: right">
+        <label for="select-choice">选择订单状态：</label>
+        <select name="choice" id="select-choice">
+            <option value="Choice 1">未付款</option>
+            <option value="Choice 2">已付款</option>
+            <option value="Choice 3">待收货</option>
+            <option value="Choice 4">已完成</option>
+        </select>
+        <button id="sendState" class="btn">搜索</button>
+   </div>
+   <div id="searchID"  style="float: right">
+        <label for="contentID">输入订单ID：</label>
+        <input id="contentID" type="text" name="id" class="input-sm" value="" placeholder="订单ID"/>
+        <button id="sendID" class="btn" >搜索</button>
+   </div>
+   <div>
+       <button id="showAll" class="btn" style="float: right">显示全部</button>
+   </div>
+</div>
+<div class="page"></div>
+
+<script src="js/json2-20110223.js"></script>
+<script src="js/jquery-2.0.3.js"></script>
+<script src="js/underscore-min.js"></script>
+<script src="js/backbone-min.js"></script>
+
+<script type="text/javascript">
+
+
+    var Orders = Backbone.Collection.extend({
+        url: 'http://222.201.139.38:8080/UserTest/User/getAllUsers'
+    });
+
+    var OrderList = Backbone.View.extend({
+        el: '.page',
+
+        showAllOrders: function (event) {
+          this.orders = new Orders();
+          this.orders.fetch({
+                success: function (my) {
+//                   if(orders!=null){
+                     $('.page').html(_.template($('#ordertemplate').html(), {orders: my.models}));
+//                   }
+//                   else{
+//                       $('.page').html("<p>无记录</p>");
+//                   }
+                }
+            });
+        }
+    });
+
+
+    $(document).on('click', '#showAll', function (event) {
+        var orderList = new OrderList();
+        orderList.showAllOrders();
+    });
+
+
+
+    $(document).on('click', '#sendID', function (event) {
+        var orderList = new OrderList();
+        this.orders = new Orders();
+        this.orders.fetch({success: function (my) {
+            var models = my.models;
+            for (var i = 0; i < models.length; i++) {
+                if (models[i].get('id') == $("#contentID").val()) {
+                    $('.page').html(_.template($('#orderItemtemplate').html(), {order: models[i]}));
+                    break;
+                }
+            }
+        }});
+    });
+
+
+</script>
+
+
+</body>
+</html>

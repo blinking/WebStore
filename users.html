@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>微商城管理端</title>
+    <style>
+        table {
+            padding: 2px;
+            margin-top: 12px;
+        }
+
+        th, td {
+            width: 200px;
+            height: 40px;
+        }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="description" content="微商城管理端,使管理员轻松管理后台事务">
+
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.css">
+    <link rel="stylesheet" href="css/my.css">
+</head>
+<body>
+
+
+<script type="text/template" id="usertemplate">
+    <table class="table table-striped table-bordered table-hover table-condensed" border="1" align="center"
+           style="width: 1000px; margin-top: 5px">
+        <thead>
+        <tr>
+            <th>username</th>
+            <th>password</th>
+            <th>id</th>
+            <th>createTime</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% _.each(users, function(user) { %>
+        <tr>
+            <td><%= user.get('username') %></td>
+            <td><%= user.get('password') %></td>
+            <td><%= user.get('id') %></td>
+            <td><%= user.get('createTime') %></td>
+        </tr>
+        <% }); %>
+        </tbody>
+    </table>
+</script>
+
+
+<script type="text/template" id="userItemtemplate">
+    <table class="table table-striped table-bordered table-hover table-condensed" border="1" align="center"
+           style="width: 1000px; margin-top: 5px">
+        <thead>
+        <tr>
+            <th>username</th>
+            <th>password</th>
+            <th>id</th>
+            <th>createTime</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><%= user.get('username') %></td>
+            <td><%= user.get('password') %></td>
+            <td><%= user.get('id') %></td>
+            <td><%= user.get('createTime') %></td>
+        </tr>
+        </tbody>
+    </table>
+</script>
+
+<div class="container col-md-12" style=" background-color: darkseagreen; height: 100px ">
+    <div class="row" style="text-align: right">
+        <h5 style="margin-right: 10px">欢迎您,xxx <a href="#">退出</a></h5>
+    </div>
+</div>
+
+<div style="width: 100%">
+    <div style="float: right">
+        <button id="showAll" class="btn" style="margin-right: 5px">显示全部</button>
+    </div>
+    <div class="search" id="searchForm" style="float: right; margin-right: 8px;">
+        <label for="content">输入用户ID：</label>
+        <input id="content" class="input-sm" name="id" type="text" value="" placeholder="用户ID"/>
+        <button id="send" class="btn">搜索</button>
+    </div>
+</div>
+
+<div class="page"></div>
+
+<script src="js/json2-20110223.js"></script>
+<script src="js/jquery-2.0.3.js"></script>
+<script src="js/underscore-min.js"></script>
+<script src="js/backbone-min.js"></script>
+
+<script type="text/javascript">
+
+    var Users = Backbone.Collection.extend({
+        url: 'http://222.201.139.38:8080/UserTest/User/getAllUsers'
+    });
+
+    var UserList = Backbone.View.extend({
+        el: '.page',
+
+//        initialize: function () {
+//        },
+
+        showAllUsers: function () {
+            this.users = new Users();
+            this.users.fetch({
+                success: function (my) {
+                    $('.page').html(_.template($('#usertemplate').html(), {users: my.models}));
+                }
+            });
+        }
+    });
+
+    $(document).on('click', '#showAll', function (event) {
+        var userList = new UserList();
+        userList.showAllUsers();
+    });
+
+    $(document).on('click', '#send', function (event) {
+        var userList = new UserList();
+        this.users = new Users();
+        this.users.fetch({success: function (my) {
+            var models = my.models;
+            for (var i = 0; i < models.length; i++) {
+                if (models[i].get('id') == $("#content").val()) {
+                    $('.page').html(_.template($('#userItemtemplate').html(), {user: models[i]}));
+                    break;
+                }
+            }
+        }});
+    });
+
+</script>
+</body>
