@@ -23,7 +23,7 @@
 <body>
 
 <script type="text/template" id="ordertemplate">
-        <table class="table table-striped table-bordered table-hover table-condensed" border="1" align="center" style="width: 1000px">
+        <table id = "ordertable" class="table table-striped table-bordered table-hover table-condensed" border="1" align="center" style="width: 1000px">
             <thead>
             <tr>
                 <th>订单ID</th>
@@ -38,14 +38,19 @@
             <tbody>
             <% _.each(orders, function(order) { %>
             <tr>
-                <td><%= order.get('id') %></td>
-                <td><%= order.get('userID') %></td>
-                <td><%= order.get('createtime') %></td>
-                <td><%= order.get('address') %></td>
-                <td><%= order.get('phone') %></td>
-                <td><%= order.get('state') %></td>
-                <td></td>
-                <!--orders.models[0].get('username')-->
+                <td id="idValue"><%= order.get('id') %></td>
+                <td ><%= order.get('userID') %></td>
+                <td ><%= order.get('createtime') %></td>
+                <td ><%= order.get('address') %></td>
+                <td ><%= order.get('phone') %></td>
+                <td ><%= order.get('state') %></td>
+                <td >
+                    <%if(order.get('id') == 3){ %>
+                    <button id="deliver" onclick="changeState(this.parentElement.parentElement)">发货</button>
+                    <% }else { %>
+                    <%='--'%>
+                    <%}%>
+                </td>
             </tr>
             <% }); %>
             </tbody>
@@ -74,6 +79,13 @@
             <td><%= order.get('address') %></td>
             <td><%= order.get('phone') %></td>
             <td><%= order.get('state') %></td>
+            <td>
+                <%if(order.get('id') == 3){ %>
+                <button id="deliver">发货</button>
+                <% }else { %>
+                <%='--'%>
+                <%}%>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -88,10 +100,10 @@
    <div id="searchState"  style="float: right">
         <label for="select-choice">选择订单状态：</label>
         <select name="choice" id="select-choice">
-            <option value="Choice 1">未付款</option>
-            <option value="Choice 2">已付款</option>
-            <option value="Choice 3">待收货</option>
-            <option value="Choice 4">已完成</option>
+            <option value="1">1</option>
+            <option value="2">已付款</option>
+            <option value="3">待收货</option>
+            <option value="4">已完成</option>
         </select>
         <button id="sendState" class="btn">搜索</button>
    </div>
@@ -121,16 +133,11 @@
     var OrderList = Backbone.View.extend({
         el: '.page',
 
-        showAllOrders: function (event) {
+        showAllOrders: function () {
           this.orders = new Orders();
           this.orders.fetch({
                 success: function (my) {
-//                   if(orders!=null){
                      $('.page').html(_.template($('#ordertemplate').html(), {orders: my.models}));
-//                   }
-//                   else{
-//                       $('.page').html("<p>无记录</p>");
-//                   }
                 }
             });
         }
@@ -143,8 +150,8 @@
     });
 
 
-
     $(document).on('click', '#sendID', function (event) {
+        var find = false;
         var orderList = new OrderList();
         this.orders = new Orders();
         this.orders.fetch({success: function (my) {
@@ -152,19 +159,53 @@
             for (var i = 0; i < models.length; i++) {
                 if (models[i].get('id') == $("#contentID").val()) {
                     $('.page').html(_.template($('#orderItemtemplate').html(), {order: models[i]}));
+                    find = true;
                     break;
                 }
             }
+            if(find == false)
+            {alert("无相关内容！");}
         }});
     });
 
 
+    $(document).on('click', '#sendState', function (event) {
+        var find = false;
+        var orderList = new OrderList();
+        this.orders = new Orders();
+        this.orders.fetch({success: function (my) {
+            var models = my.models;
+            for (var i = 0; i < models.length; i++) {
+                if (models[i].get('id') == $("#select-choice").val()) {
+                    $('.page').html(_.template($('#orderItemtemplate').html(), {order: models[i]}));
+                    find = true;
+                    break;
+                }
+            }
+            if(find == false)
+            {alert("无相关内容！");}
+        }});
+    });
+
+
+//    $(document).on('click', '#deliver', function (event) {
+//
+//        for (var i=0; i < window.ordertable.rows.length; i++) {
+//            //for (var j=0; j < window.ordertable.rows[i].cells.length; j++) {
+//                if(window.ordertable.rows[i].cells[0].innerHTML == 3){
+//                    alert("ok");
+//                }
+//           // }
+//        }
+//
+//        });
+
+    function changeState(order){
+//        alert(order);
+        alert(order.cells[0].innerHTML);
+
+    };
+
 </script>
-
-
-
-
-
-
 </body>
 </html>

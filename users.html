@@ -97,7 +97,7 @@
 <script type="text/javascript">
 
     var Users = Backbone.Collection.extend({
-        url: 'http://222.201.139.38:8080/UserTest/User/getAllUsers'
+        url: 'http://115.29.28.228/cgi-bin/getUser.cgi'
     });
 
     var UserList = Backbone.View.extend({
@@ -122,6 +122,7 @@
     });
 
     $(document).on('click', '#send', function (event) {
+        var find = false;
         var userList = new UserList();
         this.users = new Users();
         this.users.fetch({success: function (my) {
@@ -129,9 +130,12 @@
             for (var i = 0; i < models.length; i++) {
                 if (models[i].get('id') == $("#content").val()) {
                     $('.page').html(_.template($('#userItemtemplate').html(), {user: models[i]}));
+                    find = true;
                     break;
                 }
             }
+           if(find == false)
+           {alert("无相关内容！");}
         }});
     });
 
